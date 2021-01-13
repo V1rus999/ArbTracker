@@ -5,15 +5,18 @@ async function main() {
   const asks = orderBook.Asks;
 
   const initialValue = 100000;
-  fillOrder(asks, initialValue);
+  const buyResult = fillOrder(asks, initialValue);
+  console.log(
+    `You will buy ${buyResult.quantityBought} BTC at an average price of ${buyResult.averagePrice}`
+  );
 }
 
-function fillOrder(asks, initialValue) {
+function fillOrder(allOrders, initialValue) {
   const orders = [];
   var valueLeft = initialValue;
-  for (const ask of asks) {
-    const price = parseFloat(ask.price);
-    const quantity = parseFloat(ask.quantity);
+  for (const order of allOrders) {
+    const price = parseFloat(order.price);
+    const quantity = parseFloat(order.quantity);
     var quantityTaken = 0;
 
     const bucketValue = price * quantity;
@@ -22,7 +25,7 @@ function fillOrder(asks, initialValue) {
       valueLeft -= bucketValue;
       quantityTaken = quantity;
     } else {
-      quantityTaken = valueLeft / ask.price;
+      quantityTaken = valueLeft / order.price;
       valueLeft = 0;
     }
 
@@ -41,13 +44,12 @@ function fillOrder(asks, initialValue) {
     0
   );
 
-  console.log(orders);
+  //   console.log(orders);
 
-  console.log(
-    `You will buy ${quantityBought} BTC at an average price of ${
-      initialValue / quantityBought
-    }`
-  );
+  return {
+    quantityBought: quantityBought,
+    averagePrice: initialValue / quantityBought,
+  };
 }
 
 main().then();
